@@ -8,8 +8,7 @@ from tools import aggregate_metrics, detect_anomalies, analyse_sentiment, compar
 load_dotenv()
 
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
-
-# ── Helper: ask Groq ──────────────────────────────────────────────────────────
+ 
 def ask_llm(system_prompt, user_message):
     print(f"\n  [Groq call] {system_prompt[:60]}...")
     response = client.chat.completions.create(
@@ -21,14 +20,10 @@ def ask_llm(system_prompt, user_message):
         temperature=0.3
     )
     return response.choices[0].message.content
-# ── Agent 1: Product Manager ──────────────────────────────────────────────────
-# Job: define success criteria and give a go/no-go recommendation
-# Tools used: aggregate_metrics, compare_trend
 
 def pm_agent(data_dir="mock_data"):
     print("\n[Agent 1] PM Agent running...")
-
-    # Call the tools to get data
+ 
     metrics = aggregate_metrics(data_dir)
     trends  = compare_trend(data_dir)
 
@@ -55,10 +50,7 @@ Based on this data, provide your PM assessment."""
 
     return ask_llm(system_prompt, user_message)
 
-
-# ── Agent 2: Data Analyst ─────────────────────────────────────────────────────
-# Job: deep dive into the numbers, spot anomalies, assess confidence
-# Tools used: detect_anomalies, compare_trend
+ 
 
 def data_analyst_agent(data_dir="mock_data"):
     print("\n[Agent 2] Data Analyst Agent running...")
@@ -84,10 +76,7 @@ Provide your data analysis."""
 
     return ask_llm(system_prompt, user_message)
 
-
-# ── Agent 3: Marketing / Comms ────────────────────────────────────────────────
-# Job: assess customer perception and recommend communication actions
-# Tools used: analyse_sentiment
+ 
 
 def marketing_agent(data_dir="mock_data"):
     print("\n[Agent 3] Marketing/Comms Agent running...")
@@ -116,15 +105,11 @@ Provide your marketing and comms assessment."""
 
     return ask_llm(system_prompt, user_message)
 
-
-# ── Agent 4: Risk / Critic ────────────────────────────────────────────────────
-# Job: challenge assumptions, highlight risks, request more evidence
-# Tools used: reads all previous agent outputs + release notes
+ 
 
 def risk_agent(data_dir="mock_data", pm_output="", analyst_output="", marketing_output=""):
     print("\n[Agent 4] Risk/Critic Agent running...")
-
-    # Read the release notes file directly
+ 
     notes_path = os.path.join(data_dir, "release_notes.md")
     with open(notes_path) as f:
         release_notes = f.read()
@@ -154,10 +139,7 @@ Challenge these assessments, highlight overlooked risks, and produce a risk regi
 
     return ask_llm(system_prompt, user_message)
 
-
-# ── Agent 5: Synthesizer ──────────────────────────────────────────────────────
-# Job: read all agent outputs and produce the final structured JSON decision
-# This is the orchestrator's final step
+ 
 
 def synthesizer_agent(pm_output, analyst_output, marketing_output, risk_output):
     print("\n[Agent 5] Synthesizer Agent running...")
