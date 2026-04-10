@@ -1,5 +1,4 @@
-# app.py
-# Streamlit UI for the War Room multi-agent system.
+ 
 # Run with: streamlit run app.py
 
 import streamlit as st
@@ -9,15 +8,13 @@ from datetime import datetime
 from dotenv import load_dotenv
 
 load_dotenv()
-
-# ── Page config ───────────────────────────────────────────────────────────────
+ 
 st.set_page_config(
     page_title="PurpleMerit War Room",
     page_icon="🚨",
     layout="wide"
 )
-
-# ── Custom CSS ────────────────────────────────────────────────────────────────
+ 
 st.markdown("""
 <style>
     .main { background-color: #0f0f1a; }
@@ -63,22 +60,18 @@ st.markdown("""
         text-align: center;
     }
 </style>
-""", unsafe_allow_html=True)
-
-# ── Header ────────────────────────────────────────────────────────────────────
+""", unsafe_allow_html=True 
 st.markdown("# 🚨 PurpleMerit War Room")
 st.markdown("### Dashboard 2.0 Launch — Cross-Functional Decision System")
 st.divider()
-
-# ── Sidebar ───────────────────────────────────────────────────────────────────
+ 
 with st.sidebar:
     st.markdown("## ⚙️ Controls")
     st.markdown("**Data source:** `mock_data/`")
     st.markdown("**Model:** Groq LLaMA 3.3 70B")
     st.markdown("**Agents:** 5")
     st.divider()
-
-    # Check if API key is set
+ 
     api_key = os.environ.get("GROQ_API_KEY")
     if api_key:
         st.success("✅ API key loaded")
@@ -92,8 +85,7 @@ with st.sidebar:
     st.markdown("3. Marketing assesses sentiment")
     st.markdown("4. Risk/Critic challenges assumptions")
     st.markdown("5. Synthesizer makes final decision")
-
-# ── Quick metrics preview ─────────────────────────────────────────────────────
+ 
 st.markdown("### 📊 Live Metric Snapshot")
 
 try:
@@ -126,12 +118,10 @@ except Exception as e:
 
 st.divider()
 
-# ── Run button ────────────────────────────────────────────────────────────────
-st.markdown("### 🤖 Run the War Room")
+ st.markdown("### 🤖 Run the War Room")
 
 if st.button("🚨 Convene War Room — Run All Agents", type="primary", use_container_width=True):
-
-    # Import orchestrator steps individually so we can show live progress
+ 
     from agents import pm_agent, data_analyst_agent, marketing_agent, risk_agent, synthesizer_agent
 
     state = {
@@ -142,32 +132,31 @@ if st.button("🚨 Convene War Room — Run All Agents", type="primary", use_con
         "risk_output":      None,
         "final_decision":   None,
     }
-
-    # Progress bar
+ 
     progress = st.progress(0, text="Starting war room...")
 
-    # ── Agent 1: PM ───────────────────────────────────────────────────────────
+    # ── Agent 1: PM  
     with st.expander("🎯 Agent 1: Product Manager", expanded=True):
         with st.spinner("PM Agent analysing..."):
             state["pm_output"] = pm_agent(state["data_dir"])
         st.markdown(state["pm_output"])
     progress.progress(20, text="PM Agent complete...")
 
-    # ── Agent 2: Data Analyst ─────────────────────────────────────────────────
+    # ── Agent 2: Data Analyst  
     with st.expander("📊 Agent 2: Data Analyst", expanded=True):
         with st.spinner("Data Analyst running anomaly detection..."):
             state["analyst_output"] = data_analyst_agent(state["data_dir"])
         st.markdown(state["analyst_output"])
     progress.progress(40, text="Data Analyst complete...")
 
-    # ── Agent 3: Marketing ────────────────────────────────────────────────────
+    # ── Agent 3: Marketing  
     with st.expander("📣 Agent 3: Marketing / Comms", expanded=True):
         with st.spinner("Marketing Agent analysing sentiment..."):
             state["marketing_output"] = marketing_agent(state["data_dir"])
         st.markdown(state["marketing_output"])
     progress.progress(60, text="Marketing Agent complete...")
 
-    # ── Agent 4: Risk ─────────────────────────────────────────────────────────
+    # ── Agent 4: Risk 
     with st.expander("⚠️ Agent 4: Risk / Critic", expanded=True):
         with st.spinner("Risk Agent challenging assumptions..."):
             state["risk_output"] = risk_agent(
@@ -179,7 +168,7 @@ if st.button("🚨 Convene War Room — Run All Agents", type="primary", use_con
         st.markdown(state["risk_output"])
     progress.progress(80, text="Risk Agent complete...")
 
-    # ── Agent 5: Synthesizer ──────────────────────────────────────────────────
+    # ── Agent 5: Synthesizer 
     with st.spinner("🧠 Synthesizer making final decision..."):
         raw = synthesizer_agent(
             pm_output=state["pm_output"],
@@ -197,8 +186,7 @@ if st.button("🚨 Convene War Room — Run All Agents", type="primary", use_con
     progress.progress(100, text="War room complete!")
 
     decision = state["final_decision"]
-
-    # ── Save JSON output ──────────────────────────────────────────────────────
+ 
     os.makedirs("output", exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filepath  = f"output/war_room_decision_{timestamp}.json"
@@ -207,8 +195,7 @@ if st.button("🚨 Convene War Room — Run All Agents", type="primary", use_con
 
     st.success(f"✅ Report saved to `{filepath}`")
     st.divider()
-
-    # ── Decision banner ───────────────────────────────────────────────────────
+ 
     d = decision.get("decision", "Unknown")
     if d == "Proceed":
         css_class = "decision-proceed"
