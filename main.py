@@ -1,5 +1,4 @@
-# main.py
-# This is the entry point — the file you run to start everything.
+ 
 # Usage: py main.py
 
 import json
@@ -7,27 +6,17 @@ import os
 from datetime import datetime
 from orchestrator import run_war_room
 
-def main():
-    # ── Step 1: make sure the output folder exists ────────────────────────────
-    # This is where the final JSON report will be saved
+def main(): 
     output_dir = "output"
-    os.makedirs(output_dir, exist_ok=True)   
-    # exist_ok=True means "don't crash if the folder already exists"
-
-    # ── Step 2: run the war room ──────────────────────────────────────────────
-    # This triggers all 5 agents in sequence
+    os.makedirs(output_dir, exist_ok=True)    
     state = run_war_room(data_dir="mock_data")
-
-    # ── Step 3: save the final decision to a JSON file ────────────────────────
-    # We put a timestamp in the filename so each run creates a new file
+ 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename  = f"war_room_decision_{timestamp}.json"
     filepath  = os.path.join(output_dir, filename)
 
     with open(filepath, "w") as f:
-        json.dump(state["final_decision"], f, indent=2)
-
-    # ── Step 4: print a summary to the terminal ───────────────────────────────
+        json.dump(state["final_decision"], f, indent=2) 
     decision = state["final_decision"]
 
     print(f"\n{'='*50}")
