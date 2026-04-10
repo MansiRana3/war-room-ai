@@ -1,7 +1,4 @@
-# orchestrator.py
-# This is the "manager" that runs all agents in order.
-# It maintains a shared state dictionary and passes outputs between agents.
-
+ 
 import json
 from agents import (
     pm_agent,
@@ -9,11 +6,7 @@ from agents import (
     marketing_agent,
     risk_agent,
     synthesizer_agent
-)
-
-# ── The shared state ──────────────────────────────────────────────────────────
-# Think of this as the whiteboard in the war room.
-# Every agent reads from it and writes their output back to it.
+) 
 
 def create_initial_state(data_dir="mock_data"):
     return {
@@ -25,10 +18,7 @@ def create_initial_state(data_dir="mock_data"):
         "final_decision":   None,       # filled in by Agent 5
     }
 
-
-# ── Individual steps (nodes in the graph) ────────────────────────────────────
-# Each function below is one "step" in the workflow.
-# It receives the full state, does its work, updates state, returns it.
+ 
 
 def step_pm(state):
     print("\n" + "="*50)
@@ -86,9 +76,7 @@ def step_synthesizer(state):
         marketing_output=state["marketing_output"],
         risk_output=     state["risk_output"]
     )
-
-    # The synthesizer returns a JSON string — we parse it into a dictionary
-    # Strip markdown code fences if the model accidentally adds them
+ 
     cleaned = raw.strip()
     if cleaned.startswith("```"):
         cleaned = cleaned.split("```")[1]
@@ -98,22 +86,16 @@ def step_synthesizer(state):
     state["final_decision"] = json.loads(cleaned.strip())
     return state
 
-
-# ── The main workflow ─────────────────────────────────────────────────────────
-# This function runs all 5 steps in order and returns the final state.
-# Think of it as the meeting agenda — each step happens in sequence.
+ 
 
 def run_war_room(data_dir="mock_data"):
     print("\n" + "="*50)
     print("  WAR ROOM INITIATED")
     print("  PurpleMerit — Dashboard 2.0 Launch Review")
     print("="*50)
-
-    # Step 0: create the shared whiteboard
+ 
     state = create_initial_state(data_dir)
-
-    # Steps 1–5: run each agent in order
-    # Each step reads from state and writes back to it
+ 
     state = step_pm(state)
     state = step_analyst(state)
     state = step_marketing(state)
