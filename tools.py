@@ -1,30 +1,18 @@
-# tools.py
-# These are the 4 helper functions that agents will call.
-# Each one reads the mock data and returns a summary.
-
 import csv
 import json
-import os
-
-# ── Tool 1: aggregate_metrics ─────────────────────────────────────────────────
-# Reads metrics.csv and returns a simple summary dictionary.
-# A dictionary in Python is like a labeled box: {"key": value, "key2": value2}
+import os 
 
 def aggregate_metrics(data_dir="mock_data"):
     filepath = os.path.join(data_dir, "metrics.csv")
-    rows = []
-
-    # Open the CSV file and read every row into a list
+    rows = [] 
     with open(filepath, newline="") as f:
         reader = csv.DictReader(f)   # DictReader turns each row into a dictionary
         for row in reader:
             rows.append(row)
-
-    # The last 3 rows are post-launch, the first 7 are pre-launch
+ 
     pre  = rows[:7]
     post = rows[7:]
-
-    # Helper: calculate the average of a column across a set of rows
+ 
     def avg(data, col):
         return sum(float(r[col]) for r in data) / len(data)
 
@@ -53,11 +41,7 @@ def aggregate_metrics(data_dir="mock_data"):
             "churn_rate":            round(avg(pre, "churn_rate"), 4),
         }
     }
-
-
-# ── Tool 2: detect_anomalies ──────────────────────────────────────────────────
-# Finds metrics that changed dramatically after launch.
-# We calculate how many times worse each metric got (the "delta ratio").
+ 
 
 def detect_anomalies(data_dir="mock_data"):
     summary = aggregate_metrics(data_dir)
@@ -65,11 +49,9 @@ def detect_anomalies(data_dir="mock_data"):
     post = summary["post_launch_avg"]
 
     anomalies = []
-
-    # Metrics where HIGHER is worse (crash rate, latency, tickets, churn)
+ 
     worse_if_higher = ["crash_rate", "api_latency_p95", "support_tickets", "churn_rate"]
-
-    # Metrics where LOWER is worse (activation, retention, payments, dau)
+ 
     worse_if_lower  = ["activation_rate", "dau_wau", "d1_retention", "payment_success_rate"]
 
     for metric in worse_if_higher:
@@ -77,7 +59,7 @@ def detect_anomalies(data_dir="mock_data"):
         post_val = post[metric]
         if pre_val > 0:
             change_pct = ((post_val - pre_val) / pre_val) * 100
-            if change_pct > 20:   # Flag anything that got 20%+ worse
+            if change_pct > 20:    
                 anomalies.append({
                     "metric": metric,
                     "pre":    pre_val,
@@ -91,7 +73,7 @@ def detect_anomalies(data_dir="mock_data"):
         post_val = post[metric]
         if pre_val > 0:
             change_pct = ((pre_val - post_val) / pre_val) * 100
-            if change_pct > 10:   # Flag anything that dropped 10%+
+            if change_pct > 10:    
                 anomalies.append({
                     "metric": metric,
                     "pre":    pre_val,
@@ -103,25 +85,19 @@ def detect_anomalies(data_dir="mock_data"):
     return {
         "anomaly_count": len(anomalies),
         "anomalies": anomalies
-    }
-
-
-# ── Tool 3: analyse_sentiment ─────────────────────────────────────────────────
-# Reads user_feedback.json and counts themes in negative feedback.
-# No AI needed — just searches for keywords.
+    } 
 
 def analyse_sentiment(data_dir="mock_data"):
     filepath = os.path.join(data_dir, "user_feedback.json")
 
     with open(filepath) as f:
-        feedback = json.load(f)   # json.load turns the file into a Python list
+        feedback = json.load(f)    
 
     total     = len(feedback)
     positive  = sum(1 for f in feedback if f["sentiment"] == "positive")
     negative  = sum(1 for f in feedback if f["sentiment"] == "negative")
     neutral   = sum(1 for f in feedback if f["sentiment"] == "neutral")
-
-    # Count how often each theme appears in negative feedback
+ 
     themes = {"crash": 0, "slow": 0, "payment": 0, "cancel": 0, "support": 0}
     keywords = {
         "crash":   ["crash", "freeze", "freezing", "closes"],
@@ -149,10 +125,7 @@ def analyse_sentiment(data_dir="mock_data"):
         "nps_proxy": round(((positive - negative) / total) * 100, 1)
     }
 
-
-# ── Tool 4: compare_trend ─────────────────────────────────────────────────────
-# Returns a simple human-readable comparison of pre vs post launch
-# for the most important metrics. Agents paste this into their prompts.
+ 
 
 def compare_trend(data_dir="mock_data"):
     summary = aggregate_metrics(data_dir)
